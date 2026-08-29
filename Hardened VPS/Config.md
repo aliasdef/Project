@@ -17,21 +17,21 @@ cat ~/.ssh/id_ed25519.pub
 Create the SSH directory on the server:
 
 ```bash
-mkdir -p /home/scaramouche/.ssh
+mkdir -p /home/USERNAME/.ssh
 ```
 
 Add the public key:
 
 ```bash
-nano /home/scaramouche/.ssh/authorized_keys
+nano /home/USERNAME/.ssh/authorized_keys
 ```
 
 Set correct ownership and permissions:
 
 ```bash
-chown -R scaramouche:scaramouche /home/scaramouche/.ssh
-chmod 700 /home/scaramouche/.ssh
-chmod 600 /home/scaramouche/.ssh/authorized_keys
+chown -R USERNAME:USERNAME /home/USERNAME/.ssh
+chmod 700 /home/USERNAME/.ssh
+chmod 600 /home/USERNAME/.ssh/authorized_keys
 ```
 
 ---
@@ -41,19 +41,19 @@ chmod 600 /home/scaramouche/.ssh/authorized_keys
 Create the user with Bash:
 
 ```bash
-useradd -m -s /bin/bash scaramouche
+useradd -m -s /bin/bash USERNAME
 ```
 
 Set a password:
 
 ```bash
-passwd scaramouche
+passwd USERNAME
 ```
 
 Add the user to the sudo group:
 
 ```bash
-usermod -aG sudo scaramouche
+usermod -aG sudo USERNAME
 ```
 
 ---
@@ -93,14 +93,14 @@ systemctl restart ssh
 Open a second terminal and test the new configuration before closing the current SSH session:
 
 ```bash
-ssh -p 2222 scaramouche@SERVER_IP
+ssh -p 2222 USERNAME@SERVER_IP
 ```
 
 Expected result:
 
 ```text
-scaramouche + SSH key       → allowed
-scaramouche + password      → denied
+USERNAME + SSH key       → allowed
+USERNAME + password      → denied
 root + SSH key              → denied
 root + password             → denied
 ```
