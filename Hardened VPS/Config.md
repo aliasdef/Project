@@ -1,8 +1,5 @@
 ## Setup
 1. SSH key
-
----
-
 Generate an Ed25519 key on the client:
 
 ssh-keygen -t ed25519 -C "example"
