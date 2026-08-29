@@ -1,5 +1,7 @@
-Setup
+## Setup
 1. SSH key
+
+---
 
 Generate an Ed25519 key on the client:
 
