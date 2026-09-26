@@ -117,3 +117,6 @@ Check the availability of the hidden network from the new Kali terminal tab usin
 nmap -Pn -sT -p 22,80,8080 10.10.10.2
 ```
 **If the ports of the hidden machine show up as OPEN - CONGRATULATIONS, WE DID IT!**
+
+**Disclaimer:** Let me clarify that in the real world, things aren't as simple as they seem in this post. There are many ways to plug this gap. 
+Also, please note that this is not a hacking guide or anything else. This post is intended to introduce you to the world of CyberSecurity. Never use these commands on real machines or infrastructure!
