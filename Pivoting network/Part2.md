@@ -10,7 +10,8 @@ Tunneling transparent connections between isolated networks through a compromise
 *   **Kali Linux (Attacker):** `Bridged Adapter` -> IP: `192.168.1.x`
 *   **Ubuntu-1 (Pivot):** `Bridged Adapter` + `Internal Network` -> External IP: `192.168.1.x/24` | Internal IP (DMZ): `10.10.10.1`
 *   **Ubuntu-2 (Hidden Target):** `Internal Network` only -> Internal network IP: `10.10.10.2`
-||P.S. On the Ubuntu1 and Ubuntu2 virtual machines, I opened ports 22, 80, 8080||
+
+**P.S. On the Ubuntu1 and Ubuntu2 virtual machines, I opened ports 22, 80, 8080**
 ---
 
 ## Scenario and Attack Vector
