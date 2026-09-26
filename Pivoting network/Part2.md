@@ -1,24 +1,24 @@
 ### Pivoting network via LIGOLO-NG
 
-## 🛠️ What I Had on Hand (Input Data)
+## What I Had on Hand (Input Data)
 Two virtual machines running **Ubuntu** and one running **Kali Linux**. The decision was made to test the network pivoting technique using a modern tool called **Ligolo-ng**.
 
-### 🎯 Core Technique:
+### Core Technique:
 Tunneling transparent connections between isolated networks through a compromised pivot machine.
 
-### 🌐 Network Adapter Configurations in Virtual Machines:
+### Network Adapter Configurations in Virtual Machines:
 *   **Kali Linux (Attacker):** `Bridged Adapter` -> IP: `192.168.1.x`
 *   **Ubuntu-1 (Pivot):** `Bridged Adapter` + `Internal Network` -> External IP: `192.168.1.x/24` | Internal IP (DMZ): `10.10.10.1`
 *   **Ubuntu-2 (Hidden Target):** `Internal Network` only -> Internal network IP: `10.10.10.2`
-
+||P.S. On the Ubuntu1 and Ubuntu2 virtual machines, I opened ports 22, 80, 8080||
 ---
 
-## 🎬 Scenario and Attack Vector
+## Scenario and Attack Vector
 A hacker compromised a regular user's machine (**Ubuntu-1**) and discovered that it had access to a hidden subnet (`10.10.10.x`), but the user's machine itself was completely empty. To expand the attack surface and move deeper into the network, the hacker decided to use the **Ligolo-ng** utility to set up tunnel pivoting.
 
 ---
 
-## 💻 Step-by-Step Action Log (Guide)
+## Step-by-Step Action Log (Guide)
 
 ### Step 1: Network Configuration
 I am using VirtualBox; if you are using a different hypervisor, please look up the specific instructions yourself.
