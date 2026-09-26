@@ -19,5 +19,7 @@ The testbed is simulated in an isolated virtualization environment and consists 
 
 Navigation panel:
 [ssh-tunneling]()
+
 [proxychains]()
+
 [Ligoli-ng](https://github.com/aliasdef/Project/blob/main/Pivoting%20network/2_LIGOLO-NG.md)
