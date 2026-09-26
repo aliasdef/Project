@@ -109,4 +109,4 @@ Root SSH access is disabled.
                   Linux VPS
 
 
-Now we move on to the settings themselves: (Config VPS)()
+Now we move on to the settings themselves: (Config VPS)(https://github.com/aliasdef/Project/blob/main/Hardened%20VPS/Config.md)
