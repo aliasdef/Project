@@ -18,8 +18,7 @@ The testbed is simulated in an isolated virtualization environment and consists 
 *   **Ubuntu-2 (Hidden Target):** Located inside a completely isolated subnet. It has no internet access and is physically invisible to the attacking Kali Linux machine.
 
 Navigation panel:
-[ssh-tunneling]()
 
-[proxychains]()
-
-[Ligoli-ng](https://github.com/aliasdef/Project/blob/main/Pivoting%20network/2_LIGOLO-NG.md)
+1) [ssh-tunneling]()
+2) [proxychains]()
+3) [Ligoli-ng](https://github.com/aliasdef/Project/blob/main/Pivoting%20network/2_LIGOLO-NG.md)
