@@ -17,3 +17,7 @@ The testbed is simulated in an isolated virtualization environment and consists 
 *   **Ubuntu-1 (Pivot Machine / DMZ):** A machine at the intersection of two worlds. It features two network interfaces: one facing outward towards Kali, and the second leading into the closed internal segment.
 *   **Ubuntu-2 (Hidden Target):** Located inside a completely isolated subnet. It has no internet access and is physically invisible to the attacking Kali Linux machine.
 
+Navigation panel:
+[ssh-tunneling]()
+[proxychains]()
+[Ligoli-ng](https://github.com/aliasdef/Project/blob/main/Pivoting%20network/2_LIGOLO-NG.md)
